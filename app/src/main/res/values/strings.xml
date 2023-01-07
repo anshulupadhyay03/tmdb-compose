@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MovieBuff</string>
+    <string name="popular">Popular</string>
+    <string name="Upcoming">Upcoming</string>
+    <string name="Now_playing">Now Playing</string>
+    <string name="Top_rated">Top Rated</string>
+</resources>
