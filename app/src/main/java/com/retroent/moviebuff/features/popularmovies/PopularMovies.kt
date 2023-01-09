@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,20 +46,21 @@ internal fun PopularMoviesScreen(
     DisplayMovies(state)
 }
 
+
 @Composable
 fun DisplayMovies(data: LazyPagingItems<PopularMovieResult>) {
     LazyColumn(
         modifier = Modifier
             .padding(5.dp)
     ) {
-       items(items = data, key = {it.id}){
-           if (it != null) {
-               MovieRow(item = it)
-           }
-       }
-        when(data.loadState.append){
-            is LoadState.Error ->{
-                item{
+        items(items = data, key = { it.id }) {
+            if (it != null) {
+                MovieRow(item = it)
+            }
+        }
+        when (data.loadState.append) {
+            is LoadState.Error -> {
+                item {
                     Text(text = "Hey you have got the error")
                 }
             }
@@ -70,7 +72,7 @@ fun DisplayMovies(data: LazyPagingItems<PopularMovieResult>) {
 
 @Composable
 fun MovieRow(item: PopularMovieResult) {
-    Box(modifier = Modifier.padding(5.dp)){
+    Box(modifier = Modifier.padding(5.dp)) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -95,7 +97,7 @@ fun MovieRow(item: PopularMovieResult) {
             }
         }
 
-        Box(contentAlignment= Alignment.Center,
+        Box(contentAlignment = Alignment.Center,
             modifier = Modifier
                 .background(Color.Black, shape = CircleShape)
                 .layout() { measurable, constraints ->
@@ -116,8 +118,12 @@ fun MovieRow(item: PopularMovieResult) {
                         )
                     }
                 }) {
+            CircularProgressIndicator(
+                progress = item.voteAverage.toFloat() / 10,
+                color = Color.Green
+            )
             Text(
-                text = "${((item.voteAverage * 10))}%",
+                text = "${(item.voteAverage * 10).toInt()}%",
                 textAlign = TextAlign.Center,
                 color = Color.White,
                 modifier = Modifier.padding(2.dp),
@@ -127,63 +133,4 @@ fun MovieRow(item: PopularMovieResult) {
 
     }
 }
-
-
-/*Box(contentAlignment= Alignment.Center,
-modifier = Modifier
-.background(Color.Black, shape = CircleShape)
-.layout(){ measurable, constraints ->
-    // Measure the composable
-    val placeable = measurable.measure(constraints)
-
-    //get the current max dimension to assign width=height
-    val currentHeight = placeable.height
-    val currentWidth = placeable.width
-    val newDiameter = maxOf(currentHeight, currentWidth)
-
-    //assign the dimension and the center position
-    layout(newDiameter, newDiameter) {
-        // Where the composable gets placed
-        placeable.placeRelative((newDiameter-currentWidth)/2, (newDiameter-currentHeight)/2)
-    }
-}) {
-    Text(
-        text = "20%",
-        textAlign = TextAlign.Center,
-        color = Color.White,
-        modifier = Modifier.padding(1.dp),
-    )
-}*/
-
-
-/*Text(
-modifier = Modifier
-.drawBehind {
-    drawCircle(
-        color = Color.Red,
-        radius = this.size.maxDimension,
-    )
-},
-text = "${((item.voteAverage * 100) / 100)}%",
-fontSize = 7.sp
-)*/
-
-/*@Preview
-@Composable
-fun showPreview() {
-    DisplayMovies(
-        data = PopularMovies(
-            1, 2, arrayListOf(
-                PopularMovieResult(
-                    "/s16H6tpK2utvwDtzZ8Qy4qm5Emw.jpg",
-                    1, "The Avtar",
-                    2.3,
-                    "22-3-1987",
-                    34.56
-                )
-            )
-        )
-    )
-    //MovieRow()
-}*/
 
