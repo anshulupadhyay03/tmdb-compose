@@ -2,6 +2,7 @@ package com.retroent.moviebuff.features.popularmovies
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -14,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +26,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.retroent.moviebuff.ui.theme.LightMagenta
 
 
 @Composable
@@ -122,6 +123,8 @@ fun AddVoteProgressBar(voteAverage: Double) {
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier
             .background(Color.Black, shape = CircleShape)
+            .padding(1.dp)
+            .border(3.dp, LightMagenta, CircleShape)
             .layout() { measurable, constraints ->
                 // Measure the composable
                 val placeable = measurable.measure(constraints)
