@@ -19,9 +19,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.retroent.moviebuff.features.nowplaying.NowPlayingMovies
 import com.retroent.moviebuff.features.popularmovies.PopularMoviesScreen
@@ -100,29 +103,31 @@ private fun ShowMainContent(paddingValues: PaddingValues, navController: NavHost
 
 @Composable
 fun SetupBottomBar(navController: NavController) {
-    var tabState by rememberSaveable { mutableStateOf(0) }
-
-    /* NavigationRail(
-         modifier = Modifier,
-         containerColor = Color.Transparent,
-         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-     ) {
-
-     }*/
-
     NavigationBar {
-        BOTTOM_LEVEL_NAVIGATION.forEachIndexed { index, tabDetails ->
-            val isSelected = tabState == index
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        BOTTOM_LEVEL_NAVIGATION.forEach {tabDetails ->
             NavigationBarItem(
-                selected = isSelected,
+                selected = currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true,
                 onClick = {
-                    tabState = index
-                    navController.navigate(tabDetails.route)
+                    navController.navigate(tabDetails.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when re-selecting a previously selected item
+                        restoreState = true
+                    }
                 },
                 icon = {
                     Icon(
                         painter = painterResource(
-                            id = if (isSelected) tabDetails.selectedIcon else tabDetails.unselectedIcon
+                            id = if (currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true) tabDetails.selectedIcon else tabDetails.unselectedIcon
                         ),
                         contentDescription = null
                     )
@@ -168,21 +173,16 @@ fun AppDrawer() {
                 modifier = Modifier
                     .fillMaxSize(),
                 textAlign = TextAlign.Center,
-                text = "Hi All good!"
+                text = "Hi, All good!"
             )
         }
     }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     MovieBuffTheme {
-        Greeting("Android")
+      // set the preview
     }
 }
