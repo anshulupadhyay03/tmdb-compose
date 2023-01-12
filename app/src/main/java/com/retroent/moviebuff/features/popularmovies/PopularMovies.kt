@@ -26,7 +26,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.retroent.moviebuff.ui.theme.LightMagenta
+import com.retroent.moviebuff.ui.theme.LightGreen
 
 
 @Composable
@@ -124,7 +124,7 @@ fun AddVoteProgressBar(voteAverage: Double) {
         modifier = Modifier
             .background(Color.Black, shape = CircleShape)
             .padding(1.dp)
-            .border(3.dp, LightMagenta, CircleShape)
+            .border(3.dp, LightGreen, CircleShape)
             .layout() { measurable, constraints ->
                 // Measure the composable
                 val placeable = measurable.measure(constraints)
@@ -144,7 +144,7 @@ fun AddVoteProgressBar(voteAverage: Double) {
 
             }) {
         CircularProgressIndicator(
-            progress = voteAverage.toFloat() / 10, color = Color.Magenta
+            progress = voteAverage.toFloat() / 10, color = Color.Green
         )
 
         Text(
