@@ -21,7 +21,7 @@ class PopularMoviePagingSource(
            LoadResult.Page(
                data = result,
                prevKey = null,
-               nextKey = if(result.isEmpty()) null else page+1
+               nextKey = if(result.isEmpty()) null else page.plus(1)
            )
         }catch (e:Exception){
             LoadResult.Error(Exception("Something Went wrong"))

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -13,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,19 +38,8 @@ internal fun PopularMoviesScreen(
 ) {
 
     val state = viewModel.popularMovies.collectAsLazyPagingItems()
-
-    /*when (state.value) {
-        PopularScreenUiState.StartLoading -> {}
-        PopularScreenUiState.StopLoading -> {}
-        is PopularScreenUiState.Result -> {
-            val moviesData = state.value as PopularScreenUiState.Result
-            DisplayMovies(moviesData.data)
-        }
-    }*/
-
     DisplayMovies(state)
 }
-
 
 @Composable
 fun DisplayMovies(data: LazyPagingItems<PopularMovieResult>) {
@@ -62,14 +54,72 @@ fun DisplayMovies(data: LazyPagingItems<PopularMovieResult>) {
         when (data.loadState.append) {
             is LoadState.Error -> {
                 item {
-                    Text(text = "Hey you have got the error")
+                    ErrorItem("Something went wrong!Pleas try again") {
+                        data.refresh()
+                    }
                 }
             }
-            else -> {}
+            is LoadState.Loading -> {
+                item {
+                    LoadingItem()
+                }
+            }
+            is LoadState.NotLoading -> Unit
         }
+
+        when (data.loadState.refresh) {
+            is LoadState.Error -> {
+                item {
+                    ErrorItem("Something went wrong!Pleas try again") {
+                        data.refresh()
+                    }
+                }
+            }
+            is LoadState.Loading -> {
+                item {
+                    LoadingItem()
+                }
+            }
+            is LoadState.NotLoading -> Unit
+        }
+    }
+}
+
+@Composable
+fun ErrorItem(error: String, onRefreshClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .padding(5.dp),
+        shape = RectangleShape,
+        onClick = { onRefreshClick() }) {
+        Text(
+            textAlign = TextAlign.Center,
+            text = error,
+            color = Color.Red
+        )
     }
 
 }
+
+@Composable
+fun LoadingItem() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .width(40.dp)
+                .height(40.dp)
+                .padding(8.dp)
+        )
+    }
+}
+
 
 @Composable
 fun MovieRow(item: PopularMovieResult) {
