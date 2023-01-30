@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
                     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
@@ -73,9 +72,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppScaffoldContent(navController: NavHostController, onHamburgerClicked: () -> Unit) {
     Scaffold(
-        modifier = Modifier,
-        containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             SetupTopBar(onHamburgerClicked)
         },
@@ -143,7 +139,6 @@ fun SetupBottomBar(navController: NavController) {
 fun SetupTopBar(onHamburgerClicked: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary),
         navigationIcon = {
             IconButton(
                 onClick = {
@@ -165,7 +160,6 @@ fun AppDrawer() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(MaterialTheme.colorScheme.onBackground)
                 .padding(10.dp)
                 .border(2.dp, Color.Gray)
         ) {
