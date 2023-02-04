@@ -16,12 +16,7 @@ class PopularMoviesViewModel @Inject constructor(
     private val popularRepo: PopularMoviesDataRepository
 ) : ViewModel() {
 
-    /* private val _popularMovies =
-         MutableStateFlow<PopularScreenUiState>(PopularScreenUiState.StartLoading)
-
-     val popularMovies = _popularMovies.asStateFlow()*/
-
-    val popularMovies: Flow<PagingData<PopularMovieResult>> = Pager(
+    val popularMovies: Flow<PagingData<MovieResult>> = Pager(
         pagingSourceFactory = { PopularMoviePagingSource(popularRepo) },
         config = PagingConfig(pageSize = 20)
     ).flow.cachedIn(viewModelScope)

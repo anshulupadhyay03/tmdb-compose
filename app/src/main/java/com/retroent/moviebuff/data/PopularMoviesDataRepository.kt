@@ -1,6 +1,6 @@
 package com.retroent.moviebuff.data
 
-import com.retroent.moviebuff.features.popularmovies.PopularMovieResult
+import com.retroent.moviebuff.features.popularmovies.MovieResult
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.suspendOnSuccess
@@ -22,9 +22,9 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
         }
     }.flowOn(Dispatchers.IO)
 
-    private fun mapToDomain(data: PopularMoviesResponse): List<PopularMovieResult> {
+    private fun mapToDomain(data: PUNTMoviesResponse): List<MovieResult> {
         return data.results.map {
-           PopularMovieResult(
+           MovieResult(
                 it.posterPath,
                 it.id,
                 it.title,
@@ -34,5 +34,38 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
             )
         }
     }
+
+    fun fetchUpcomingMovies(pageNo:Int) = flow {
+        service.getUpcomingMovies(pageNo).suspendOnSuccess {
+            val result = mapToDomain(this.data)
+            emit(result)
+        }.onError {
+            println("Movies error :${this.errorBody}")
+        }.onException {
+            println("Movies error :${this}")
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun fetchNowPlayingMovies(pageNo:Int) = flow {
+        service.getNowPlayingMovies(pageNo).suspendOnSuccess {
+            val result = mapToDomain(this.data)
+            emit(result)
+        }.onError {
+            println("Movies error :${this.errorBody}")
+        }.onException {
+            println("Movies error :${this}")
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun fetchTopRatedMovies(pageNo:Int) = flow {
+        service.getTopRatedMovies(pageNo).suspendOnSuccess {
+            val result = mapToDomain(this.data)
+            emit(result)
+        }.onError {
+            println("Movies error :${this.errorBody}")
+        }.onException {
+            println("Movies error :${this}")
+        }
+    }.flowOn(Dispatchers.IO)
 
 }

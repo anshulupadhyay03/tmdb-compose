@@ -1,6 +1,6 @@
 package com.retroent.moviebuff.features.popularmovies
 
-data class PopularMovieResult(
+data class MovieResult(
     val imageUrl: String,
     val id: Int,
     val title: String,
@@ -8,5 +8,3 @@ data class PopularMovieResult(
     val releaseDate: String,
     val voteAverage: Double
 )
-
-data class PopularMovies(val page:Int,val totalPages:Int,val movies:List<PopularMovieResult>)

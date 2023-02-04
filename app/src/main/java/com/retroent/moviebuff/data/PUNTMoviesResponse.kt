@@ -3,7 +3,8 @@ package com.retroent.moviebuff.data
 
 import com.google.gson.annotations.SerializedName
 
-data class PopularMoviesResponse(
+//common reponse class for popular,upcoming,Now_playing and top_rated movies
+data class PUNTMoviesResponse(
     @SerializedName("page")
     val page: Int = 0,
     @SerializedName("results")
