@@ -11,6 +11,6 @@ internal fun UpcomingMovies(
 ){
 
     val state = viewModel.upcomingMovies.collectAsLazyPagingItems()
-    DisplayMovies(state)
+    DisplayMovies(state){}
 }
 

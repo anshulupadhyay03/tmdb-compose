@@ -5,10 +5,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.retroent.moviebuff.features.commonui.DisplayMovies
 
+
 @Composable
 internal fun TopRatedMovies(
     viewModel: TopRatedMoviesViewModel = hiltViewModel()
 ){
    val state = viewModel.topRatedMovies.collectAsLazyPagingItems()
-    DisplayMovies(data = state)
+    DisplayMovies(data = state){}
+
 }

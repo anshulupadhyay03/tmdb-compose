@@ -10,5 +10,5 @@ internal fun NowPlayingMovies(
     viewModel: NowPlayingMoviesViewModel = hiltViewModel()
 ){
     val state = viewModel.nowPlayingMovies.collectAsLazyPagingItems()
-    DisplayMovies(data = state)
+    DisplayMovies(data = state){}
 }

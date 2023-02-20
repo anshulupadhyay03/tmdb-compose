@@ -1,10 +1,19 @@
 package com.retroent.moviebuff
 
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import androidx.navigation.navigation
+import com.retroent.moviebuff.features.nowplaying.NowPlayingMovies
+import com.retroent.moviebuff.features.popularmovies.PopularMoviesScreen
+import com.retroent.moviebuff.features.toprated.TopRatedMovies
+import com.retroent.moviebuff.features.upcomingmovies.UpcomingMovies
+
 data class TabDetails(
-    val route:String,
-    val selectedIcon:Int,
-    val unselectedIcon:Int,
-    val iconTextId:Int
+    val route: String,
+    val selectedIcon: Int,
+    val unselectedIcon: Int,
+    val iconTextId: Int
 )
 
 val BOTTOM_LEVEL_NAVIGATION = listOf(
@@ -32,5 +41,13 @@ val BOTTOM_LEVEL_NAVIGATION = listOf(
         unselectedIcon = R.drawable.outline_home,
         iconTextId = R.string.Top_rated
     )
-
 )
+
+fun NavGraphBuilder.bottomNavGraph(navController: NavController) {
+    navigation(startDestination = BOTTOM_LEVEL_NAVIGATION[0].route, route = "home") {
+        composable(BOTTOM_LEVEL_NAVIGATION[0].route) { PopularMoviesScreen(navController) }
+        composable(BOTTOM_LEVEL_NAVIGATION[1].route) { UpcomingMovies() }
+        composable(BOTTOM_LEVEL_NAVIGATION[2].route) { NowPlayingMovies() }
+        composable(BOTTOM_LEVEL_NAVIGATION[3].route) { TopRatedMovies() }
+    }
+}

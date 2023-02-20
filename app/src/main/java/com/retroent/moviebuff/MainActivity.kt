@@ -3,12 +3,10 @@ package com.retroent.moviebuff
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,14 +20,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.retroent.moviebuff.features.nowplaying.NowPlayingMovies
-import com.retroent.moviebuff.features.popularmovies.PopularMoviesScreen
-import com.retroent.moviebuff.features.toprated.TopRatedMovies
-import com.retroent.moviebuff.features.upcomingmovies.UpcomingMovies
+import androidx.navigation.navArgument
+import com.retroent.moviebuff.features.moviedetails.MovieDetailsScreen
 import com.retroent.moviebuff.ui.theme.MovieBuffTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -87,13 +84,16 @@ fun AppScaffoldContent(navController: NavHostController, onHamburgerClicked: () 
 private fun ShowMainContent(paddingValues: PaddingValues, navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = BOTTOM_LEVEL_NAVIGATION[0].route,
+        startDestination = "home",
         Modifier.padding(paddingValues)
     ) {
-        composable(BOTTOM_LEVEL_NAVIGATION[0].route) { PopularMoviesScreen() }
-        composable(BOTTOM_LEVEL_NAVIGATION[1].route) { UpcomingMovies() }
-        composable(BOTTOM_LEVEL_NAVIGATION[2].route) { NowPlayingMovies() }
-        composable(BOTTOM_LEVEL_NAVIGATION[3].route) { TopRatedMovies() }
+        bottomNavGraph(navController)
+        composable(
+            "details/{movieId}",
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+        ) {
+            MovieDetailsScreen()
+        }
     }
 }
 
@@ -102,7 +102,7 @@ fun SetupBottomBar(navController: NavController) {
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
-        BOTTOM_LEVEL_NAVIGATION.forEach {tabDetails ->
+        BOTTOM_LEVEL_NAVIGATION.forEach { tabDetails ->
             NavigationBarItem(
                 selected = currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true,
                 onClick = {
@@ -177,6 +177,6 @@ fun AppDrawer() {
 @Composable
 fun DefaultPreview() {
     MovieBuffTheme {
-      // set the preview
+        // set the preview
     }
 }

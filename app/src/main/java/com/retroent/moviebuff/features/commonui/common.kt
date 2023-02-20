@@ -2,6 +2,7 @@ package com.retroent.moviebuff.features.commonui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -30,13 +31,13 @@ import com.retroent.moviebuff.ui.theme.LightGreen
 
 
 @Composable
-fun DisplayMovies(data: LazyPagingItems<MovieResult>) {
+fun DisplayMovies(data: LazyPagingItems<MovieResult>, onItemClick: (id: Int) -> Unit) {
     LazyColumn(
         modifier = Modifier.padding(5.dp)
     ) {
         items(items = data, key = { it.id }) {
             if (it != null) {
-                MovieRow(item = it)
+                MovieRow(item = it, onItemClick)
             }
         }
         when (data.loadState.append) {
@@ -74,17 +75,18 @@ fun DisplayMovies(data: LazyPagingItems<MovieResult>) {
 }
 
 @Composable
-fun MovieRow(item: MovieResult) {
+fun MovieRow(item: MovieResult, onItemClick: (id: Int) -> Unit) {
     Box(modifier = Modifier.padding(5.dp)) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
+                .clickable(onClick = { onItemClick(item.id) }),
         ) {
             Row {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data("https://image.tmdb.org/t/p/w300${item.imageUrl}").crossfade(true)
+                        .data("https://image.tmdb.org/t/p/original${item.imageUrl}").crossfade(true)
                         .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,

@@ -21,5 +21,4 @@ class TopRatedMoviesViewModel @Inject constructor(
         pagingSourceFactory = { TopRatedMoviePagingSource(popularRepo) },
         config = PagingConfig(pageSize = 20)
     ).flow.cachedIn(viewModelScope)
-
 }
