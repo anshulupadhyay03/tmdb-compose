@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -21,6 +20,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -103,7 +104,13 @@ fun MovieRow(item: MovieResult, onItemClick: (id: Int) -> Unit) {
                         .padding(5.dp)
                         .fillMaxHeight()
                 ) {
-                    Text(text = item.title)
+                    Text(
+                        text = item.title,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                     Row {
                         Column {
                             Text(text = "Releasing On:${item.releaseDate}")
@@ -116,7 +123,8 @@ fun MovieRow(item: MovieResult, onItemClick: (id: Int) -> Unit) {
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            AddVoteProgressBar(item.voteAverage)
+
+                                AddVoteProgressBar(item.voteAverage)
                         }
                     }
                 }
@@ -154,13 +162,16 @@ fun AddVoteProgressBar(voteAverage: Double) {
             progress = voteAverage.toFloat() / 10, color = Color.Green,
         )
 
-        Text(
-            text = "${(voteAverage * 10).toInt()}%",
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            modifier = Modifier.padding(2.dp),
-            fontSize = 8.sp
-        )
+            Text(
+                text = "${(voteAverage * 10).toInt()}%",
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                modifier = Modifier.padding(2.dp),
+                fontSize = 12.sp,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold
+                )
+            )
     }
 }
 
@@ -199,7 +210,6 @@ fun LoadingItem() {
         )
     }
 }
-
 
 @Composable
 fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {

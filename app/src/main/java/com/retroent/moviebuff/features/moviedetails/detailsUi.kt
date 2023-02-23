@@ -1,14 +1,14 @@
 package com.retroent.moviebuff.features.moviedetails
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextIndent
@@ -28,23 +29,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
+import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.features.commonui.AddVoteProgressBar
 import eu.wewox.textflow.TextFlow
 import eu.wewox.textflow.TextFlowObstacleAlignment
 
-val gradientColors = listOf(Color.Cyan, Color.Green, Color.Red)
-
+val gradientColors = listOf(Color.Blue, Color.Green, Color.Red)
 
 @Composable
 fun MovieDetailsScreen(
     movieDetailsViewModel: MovieDetailsVm = hiltViewModel()
 ) {
     val movieDetailState by movieDetailsViewModel.movieDetailState.collectAsState()
-    when(movieDetailState){
-         MovieDetailsUiState.Loading ->{
+    when (movieDetailState) {
+        MovieDetailsUiState.Loading -> {
             println("Loading")
         }
-        is MovieDetailsUiState.Success ->{
+        is MovieDetailsUiState.Success -> {
             ShowMovieDetails((movieDetailState as MovieDetailsUiState.Success).movieDetails)
         }
         else -> {
@@ -63,29 +64,80 @@ fun ShowMovieDetails(movieDetailsModel: MovieDetailsModel) {
             .verticalScroll(rememberScrollState())
     ) {
         ShowImages(movieDetailsModel)
-        TextFlow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black),
-            style = TextStyle(
-                brush = Brush.linearGradient(colors = gradientColors)
-            ),
-            text = movieDetailsModel.overview,
-            obstacleAlignment = TextFlowObstacleAlignment.TopStart,
+        ShowOverview(movieDetailsModel.overview, movieDetailsModel.vote)
+        ShowMovieInfo(movieDetailsModel.movieInfo)
+    }
+}
 
-            ) {
-            AddVoteProgressBar(voteAverage = movieDetailsModel.vote)
-        }
+@Composable
+fun ShowMovieInfo(movieInfo: MovieInfo) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .wrapContentWidth()
+            .padding(5.dp)
+            .background(Color.DarkGray)
+
+    ) {
+        MovieInfoText("Status",movieInfo.status)
+
+        MovieInfoText("Language",movieInfo.language)
+
+        MovieInfoText("Budget",movieInfo.movieBudget)
+
+        MovieInfoText("Revenue",movieInfo.movieRevenue)
+    }
+}
+
+@Composable
+fun MovieInfoText(title:String,data:String) {
+    Column(modifier = Modifier.padding(3.dp)) {
+        Text(
+            text = title,
+            color = Color.White,
+            style = TextStyle(
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Text(
+            text = data,
+            color = Color.White,
+            style = TextStyle(
+                fontSize = 10.sp,
+                fontWeight = FontWeight.ExtraLight
+            )
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalTextApi::class)
+private fun ShowOverview(overview: String, vote: Double) {
+    TextFlow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.DarkGray),
+        style = TextStyle(
+            brush = Brush.linearGradient(colors = gradientColors)
+        ),
+        text = overview,
+        obstacleAlignment = TextFlowObstacleAlignment.TopStart,
+
+        ) {
+        AddVoteProgressBar(voteAverage = vote)
     }
 }
 
 @Composable
 private fun ShowImages(movieDetailsModel: MovieDetailsModel) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(200.dp),
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
         contentAlignment = Alignment.CenterStart
-    ){
+    ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data("https://image.tmdb.org/t/p/original${movieDetailsModel.backDropImage}")
@@ -98,25 +150,39 @@ private fun ShowImages(movieDetailsModel: MovieDetailsModel) {
                 .fillMaxHeight()
                 .alpha(0.3f)
         )
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(180.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://image.tmdb.org/t/p/original${movieDetailsModel.posterImage}")
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(180.dp)
-                    .padding(start = 5.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .zIndex(0.7f)
-            )
-
+            val visibleState = remember {
+                MutableTransitionState(false).apply {
+                    targetState = true // start the animation immediately
+                }
+            }
+            val density = LocalDensity.current
+            AnimatedVisibility(
+                visibleState = visibleState,
+                enter = slideInVertically {
+                    // Slide in from 40 dp from the top.
+                    with(density) { -200.dp.roundToPx() }
+                }
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data("https://image.tmdb.org/t/p/original${movieDetailsModel.posterImage}")
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(180.dp)
+                        .padding(start = 5.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .zIndex(0.7f)
+                )
+            }
             Column(modifier = Modifier.padding(5.dp)) {
                 Text(
                     text = movieDetailsModel.title,
@@ -151,7 +217,7 @@ fun ShowMovieDetails(date: String, generes: String, duration: String) {
         buildAnnotatedString {
             withStyle(
                 style = paragraphStyle
-            ){
+            ) {
                 append(date)
                 append("\t")
                 append(bullet)
@@ -167,10 +233,10 @@ fun ShowMovieDetails(date: String, generes: String, duration: String) {
     )
 }
 
-fun Int.toMeaningfulDuration():String{
-    val hours = this/60
-    val minutes = this%60
-    return if(hours == 0)  "${minutes}m" else "${hours}h ${minutes}m"
+fun Int.toMeaningfulDuration(): String {
+    val hours = this / 60
+    val minutes = this % 60
+    return if (hours == 0) "${minutes}m" else "${hours}h ${minutes}m"
 }
 
 @Preview

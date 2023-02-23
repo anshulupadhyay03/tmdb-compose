@@ -9,4 +9,18 @@ data class MovieDetailsModel(
     val backDropImage: String,
     val vote: Double,
     val posterImage: String,
+    val movieInfo: MovieInfo
 )
+
+data class MovieInfo(
+    val status: String,
+    val language: String,
+    private val budget: Long,
+    private val revenue: Long
+) {
+    val movieBudget
+        get() = if(budget>0) "$${budget}" else "--"
+
+    val movieRevenue
+        get() = if(revenue>0) "$${revenue}" else "--"
+}

@@ -1,6 +1,7 @@
 package com.retroent.moviebuff.data
 
 import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
+import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.features.popularmovies.MovieResult
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -12,10 +13,10 @@ import javax.inject.Inject
 
 class PopularMoviesDataRepository @Inject constructor(private val service: BottomMenuApiService) {
 
-    fun fetchPopularMovies(pageNo:Int) = flow {
-         service.getPopularMovies(pageNo).suspendOnSuccess {
-             val result = mapToDomain(this.data)
-             emit(result)
+    fun fetchPopularMovies(pageNo: Int) = flow {
+        service.getPopularMovies(pageNo).suspendOnSuccess {
+            val result = mapToDomain(this.data)
+            emit(result)
         }.onError {
             println("Movies error :${this.errorBody}")
         }.onException {
@@ -25,7 +26,7 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
 
     private fun mapToDomain(data: PUNTMoviesResponse): List<MovieResult> {
         return data.results.map {
-           MovieResult(
+            MovieResult(
                 it.posterPath,
                 it.id,
                 it.title,
@@ -36,7 +37,7 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
         }
     }
 
-    fun fetchUpcomingMovies(pageNo:Int) = flow {
+    fun fetchUpcomingMovies(pageNo: Int) = flow {
         service.getUpcomingMovies(pageNo).suspendOnSuccess {
             val result = mapToDomain(this.data)
             emit(result)
@@ -47,7 +48,7 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
         }
     }.flowOn(Dispatchers.IO)
 
-    fun fetchNowPlayingMovies(pageNo:Int) = flow {
+    fun fetchNowPlayingMovies(pageNo: Int) = flow {
         service.getNowPlayingMovies(pageNo).suspendOnSuccess {
             val result = mapToDomain(this.data)
             emit(result)
@@ -58,7 +59,7 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
         }
     }.flowOn(Dispatchers.IO)
 
-    fun fetchTopRatedMovies(pageNo:Int) = flow {
+    fun fetchTopRatedMovies(pageNo: Int) = flow {
         service.getTopRatedMovies(pageNo).suspendOnSuccess {
             val result = mapToDomain(this.data)
             emit(result)
@@ -69,7 +70,7 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getMovieDetails(id:Int) = flow {
+    fun getMovieDetails(id: Int) = flow {
         service.getMovieDetails(id).suspendOnSuccess {
             emit(mapToDomain(this.data))
         }.onError {
@@ -78,20 +79,37 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
             println("Movies error :${this}")
         }
     }
-    private fun mapToDomain(response: MovieDetailsResponse):MovieDetailsModel {
+
+    private fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
         val title = response.original_title
         val overview = response.overview
         val releaseDate = response.release_date
         val genres = response.genres.map {
-                it.name
+            it.name
         }.joinToString()
 
         val duration = response.runtime
         val backDropImage = response.backdrop_path
         val vote = response.vote_average
         val posterImage = response.poster_path
+        val movieInfo = MovieInfo(
+            response.status,
+            response.original_language,
+            response.budget,
+            response.revenue
+        )
 
-        return MovieDetailsModel(title,overview,releaseDate,genres,duration,backDropImage,vote,posterImage)
+        return MovieDetailsModel(
+            title,
+            overview,
+            releaseDate,
+            genres,
+            duration,
+            backDropImage,
+            vote,
+            posterImage,
+            movieInfo
+        )
     }
 
 }

@@ -3,10 +3,14 @@ package com.retroent.moviebuff
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -68,16 +72,35 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffoldContent(navController: NavHostController, onHamburgerClicked: () -> Unit) {
+
+    var bottomBarVisibilityState by rememberSaveable { (mutableStateOf(true)) }
+    var topBarVisibilityState by rememberSaveable { (mutableStateOf(true)) }
+
     Scaffold(
         topBar = {
-            SetupTopBar(onHamburgerClicked)
+            SetupTopBar(onHamburgerClicked, topBarVisibilityState)
         },
         bottomBar = {
-            SetupBottomBar(navController)
+            SetupBottomBar(navController, bottomBarVisibilityState)
         }
     ) { pdValue ->
         ShowMainContent(pdValue, navController)
     }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val route = navBackStackEntry?.destination?.route
+    println("my route $route")
+    when (route) {
+        "details/{movieId}" -> {
+            topBarVisibilityState = false
+            bottomBarVisibilityState = false
+        }
+        else -> {
+            topBarVisibilityState = true
+            bottomBarVisibilityState = true
+        }
+    }
+
 }
 
 @Composable
@@ -98,59 +121,71 @@ private fun ShowMainContent(paddingValues: PaddingValues, navController: NavHost
 }
 
 @Composable
-fun SetupBottomBar(navController: NavController) {
-    NavigationBar {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-        BOTTOM_LEVEL_NAVIGATION.forEach { tabDetails ->
-            NavigationBarItem(
-                selected = currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true,
-                onClick = {
-                    navController.navigate(tabDetails.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+fun SetupBottomBar(navController: NavController, bottomBarVisibilityState: Boolean) {
+    AnimatedVisibility(
+        visible = bottomBarVisibilityState,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+    ) {
+        NavigationBar {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            BOTTOM_LEVEL_NAVIGATION.forEach { tabDetails ->
+                NavigationBarItem(
+                    selected = currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true,
+                    onClick = {
+                        navController.navigate(tabDetails.route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // Restore state when re-selecting a previously selected item
+                            restoreState = true
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when re-selecting a previously selected item
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(
-                            id = if (currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true) tabDetails.selectedIcon else tabDetails.unselectedIcon
-                        ),
-                        contentDescription = null
-                    )
-                },
-                label = { Text(text = stringResource(id = tabDetails.iconTextId)) }
-            )
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(
+                                id = if (currentDestination?.hierarchy?.any { it.route == tabDetails.route } == true) tabDetails.selectedIcon else tabDetails.unselectedIcon
+                            ),
+                            contentDescription = null
+                        )
+                    },
+                    label = { Text(text = stringResource(id = tabDetails.iconTextId)) }
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetupTopBar(onHamburgerClicked: () -> Unit) {
-    TopAppBar(
-        title = { Text(text = stringResource(id = R.string.app_name)) },
-        navigationIcon = {
-            IconButton(
-                onClick = {
-                    onHamburgerClicked()
-                }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.menu_top_icon),
-                    contentDescription = null
-                )
+fun SetupTopBar(onHamburgerClicked: () -> Unit, topBarVisibilityState:Boolean) {
+    AnimatedVisibility(
+        visible = topBarVisibilityState,
+        enter = slideInVertically(initialOffsetY = { -it }),
+        exit = slideOutVertically(targetOffsetY = { -it }),
+    ) {
+        TopAppBar(
+            title = { Text(text = stringResource(id = R.string.app_name)) },
+            navigationIcon = {
+                IconButton(
+                    onClick = {
+                        onHamburgerClicked()
+                    }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.menu_top_icon),
+                        contentDescription = null
+                    )
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
