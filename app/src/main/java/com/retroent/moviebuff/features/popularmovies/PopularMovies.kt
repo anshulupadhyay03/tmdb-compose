@@ -8,17 +8,20 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.retroent.moviebuff.features.commonui.DisplayMovies
 
 
+
 @Composable
 internal fun PopularMoviesScreen(
     navController: NavController,
     viewModel: PopularMoviesViewModel = hiltViewModel()
 ) {
 
-    val state = viewModel.popularMovies.collectAsLazyPagingItems()
-    DisplayMovies(state) {
-        navController.navigate("details/$it")
-    }
+    val data = viewModel.popularMovies.collectAsLazyPagingItems()
+     DisplayMovies(data) {
+         println("Ansh movieId $it")
+         navController.navigate("details/$it")
+     }
 }
+
 
 
 
