@@ -81,12 +81,12 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
     }
 
     private fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
-        val title = response.original_title
+        val title = response.title
         val overview = response.overview
         val releaseDate = response.release_date
-        val genres = response.genres.map {
+        val genres = response.genres.joinToString {
             it.name
-        }.joinToString()
+        }
 
         val duration = response.runtime
         val backDropImage = response.backdrop_path

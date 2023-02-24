@@ -8,9 +8,10 @@ import com.retroent.moviebuff.features.commonui.DisplayMovies
 
 @Composable
 internal fun TopRatedMovies(
-    viewModel: TopRatedMoviesViewModel = hiltViewModel()
+    viewModel: TopRatedMoviesViewModel = hiltViewModel(),
+    onItemClick: (id: Int?) -> Unit
 ){
    val state = viewModel.topRatedMovies.collectAsLazyPagingItems()
-    DisplayMovies(data = state){}
+    DisplayMovies(data = state,onItemClick)
 
 }

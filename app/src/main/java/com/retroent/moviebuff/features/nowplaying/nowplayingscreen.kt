@@ -7,8 +7,9 @@ import com.retroent.moviebuff.features.commonui.DisplayMovies
 
 @Composable
 internal fun NowPlayingMovies(
-    viewModel: NowPlayingMoviesViewModel = hiltViewModel()
+    viewModel: NowPlayingMoviesViewModel = hiltViewModel(),
+    onItemClick: (id: Int?) -> Unit
 ){
     val state = viewModel.nowPlayingMovies.collectAsLazyPagingItems()
-    DisplayMovies(data = state){}
+    DisplayMovies(data = state,onItemClick)
 }

@@ -2,7 +2,6 @@ package com.retroent.moviebuff.features.moviedetails
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -33,8 +31,6 @@ import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.features.commonui.AddVoteProgressBar
 import eu.wewox.textflow.TextFlow
 import eu.wewox.textflow.TextFlowObstacleAlignment
-
-val gradientColors = listOf(Color.Blue, Color.Green, Color.Red)
 
 @Composable
 fun MovieDetailsScreen(
@@ -71,12 +67,12 @@ fun ShowMovieDetails(movieDetailsModel: MovieDetailsModel) {
 
 @Composable
 fun ShowMovieInfo(movieInfo: MovieInfo) {
-    Column(
+    Row(
         modifier = Modifier
             .wrapContentHeight()
-            .wrapContentWidth()
-            .padding(5.dp)
-            .background(Color.DarkGray)
+            .fillMaxWidth()
+            .padding(5.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
 
     ) {
         MovieInfoText("Status",movieInfo.status)
@@ -94,7 +90,7 @@ fun MovieInfoText(title:String,data:String) {
     Column(modifier = Modifier.padding(3.dp)) {
         Text(
             text = title,
-            color = Color.White,
+            color = Color.DarkGray,
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
@@ -103,10 +99,10 @@ fun MovieInfoText(title:String,data:String) {
 
         Text(
             text = data,
-            color = Color.White,
+            color = Color.Gray,
             style = TextStyle(
                 fontSize = 10.sp,
-                fontWeight = FontWeight.ExtraLight
+                fontWeight = FontWeight.Medium
             )
         )
     }
@@ -118,13 +114,9 @@ private fun ShowOverview(overview: String, vote: Double) {
     TextFlow(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.DarkGray),
-        style = TextStyle(
-            brush = Brush.linearGradient(colors = gradientColors)
-        ),
+            .padding(5.dp),
         text = overview,
         obstacleAlignment = TextFlowObstacleAlignment.TopStart,
-
         ) {
         AddVoteProgressBar(voteAverage = vote)
     }

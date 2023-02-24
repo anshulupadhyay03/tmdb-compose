@@ -45,9 +45,24 @@ val BOTTOM_LEVEL_NAVIGATION = listOf(
 
 fun NavGraphBuilder.bottomNavGraph(navController: NavController) {
     navigation(startDestination = BOTTOM_LEVEL_NAVIGATION[0].route, route = "home") {
-        composable(BOTTOM_LEVEL_NAVIGATION[0].route) { PopularMoviesScreen(navController) }
-        composable(BOTTOM_LEVEL_NAVIGATION[1].route) { UpcomingMovies() }
-        composable(BOTTOM_LEVEL_NAVIGATION[2].route) { NowPlayingMovies() }
-        composable(BOTTOM_LEVEL_NAVIGATION[3].route) { TopRatedMovies() }
+        composable(BOTTOM_LEVEL_NAVIGATION[0].route) {
+            PopularMoviesScreen {
+                navigateToMovieDetails(navController, it)
+            }
+        }
+        composable(BOTTOM_LEVEL_NAVIGATION[1].route) { UpcomingMovies{
+            navigateToMovieDetails(navController, it)
+        } }
+        composable(BOTTOM_LEVEL_NAVIGATION[2].route) { NowPlayingMovies{
+            navigateToMovieDetails(navController, it)
+        }}
+        composable(BOTTOM_LEVEL_NAVIGATION[3].route) { TopRatedMovies{
+            navigateToMovieDetails(navController, it)
+        } }
     }
+}
+
+private fun navigateToMovieDetails(navController: NavController, id: Int?) {
+    println("Ansh movieId $id")
+    navController.navigate("details/$id")
 }
