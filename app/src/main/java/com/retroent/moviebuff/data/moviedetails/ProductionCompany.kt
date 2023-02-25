@@ -1,4 +1,4 @@
-package com.retroent.moviebuff.data
+package com.retroent.moviebuff.data.moviedetails
 
 data class ProductionCompany(
     val id: Int,

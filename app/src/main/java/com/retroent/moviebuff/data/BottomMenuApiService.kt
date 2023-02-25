@@ -1,5 +1,7 @@
 package com.retroent.moviebuff.data
 
+import com.retroent.moviebuff.data.moviedetails.MovieReviewsResponse
+import com.retroent.moviebuff.data.moviedetails.MovieDetailsResponse
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -20,4 +22,7 @@ interface BottomMenuApiService {
 
     @GET("3/movie/{movie_id}")
     suspend fun getMovieDetails(@Path("movie_id") id:Int) : ApiResponse<MovieDetailsResponse>
+
+    @GET("3/movie/{movie_id}/reviews")
+    suspend fun getMovieReviews(@Path("movie_id") id:Int) : ApiResponse<MovieReviewsResponse>
 }

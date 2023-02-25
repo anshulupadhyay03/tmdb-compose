@@ -1,4 +1,4 @@
-package com.retroent.moviebuff.data
+package com.retroent.moviebuff.data.moviedetails
 
 data class ProductionCountry(
     val iso_3166_1: String,

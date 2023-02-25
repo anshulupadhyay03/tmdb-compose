@@ -3,7 +3,8 @@ package com.retroent.moviebuff.features.moviedetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.retroent.moviebuff.data.PopularMoviesDataRepository
+import com.retroent.moviebuff.data.moviedetails.MovieDetailsRepo
+import com.retroent.moviebuff.domain.moviedetails.MovieReview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,21 +15,29 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieDetailsVm @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    popularRepo: PopularMoviesDataRepository
+    repo: MovieDetailsRepo
 ) : ViewModel() {
 
     private val movieId = savedStateHandle.get<Int>("movieId")
 
-     val movieDetailState:StateFlow<MovieDetailsUiState> =
-        popularRepo.getMovieDetails(movieId!!)
+    val movieDetailState: StateFlow<MovieDetailsUiState> =
+        repo.getMovieDetails(movieId!!)
             .map {
-               return@map MovieDetailsUiState.Success(it)
+                return@map MovieDetailsUiState.Success(it)
             }
-        .stateIn(
-       scope =  viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = MovieDetailsUiState.Loading
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = MovieDetailsUiState.Loading
 
-    )
+            )
+
+    val stateFlowOfReviews: StateFlow<List<MovieReview>> =
+        repo.getMovieReviews(movieId!!).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+
+        )
 
 }

@@ -19,8 +19,21 @@ data class MovieInfo(
     private val revenue: Long
 ) {
     val movieBudget
-        get() = if(budget>0) "$${budget}" else "--"
+        get() = if (budget > 0) "$${budget}" else "--"
 
     val movieRevenue
-        get() = if(revenue>0) "$${revenue}" else "--"
+        get() = if (revenue > 0) "$${revenue}" else "--"
 }
+
+data class MovieReview(
+    val content: String,
+    val title: String,
+    val updatedAt: String,
+    val url: String,
+    val avatarPath: String,
+    val rating: Int
+)
+
+
+
+

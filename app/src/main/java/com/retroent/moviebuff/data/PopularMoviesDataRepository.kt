@@ -1,7 +1,5 @@
 package com.retroent.moviebuff.data
 
-import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
-import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.features.popularmovies.MovieResult
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
@@ -69,47 +67,4 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
             println("Movies error :${this}")
         }
     }.flowOn(Dispatchers.IO)
-
-    fun getMovieDetails(id: Int) = flow {
-        service.getMovieDetails(id).suspendOnSuccess {
-            emit(mapToDomain(this.data))
-        }.onError {
-            println("Movies error :${this.errorBody}")
-        }.onException {
-            println("Movies error :${this}")
-        }
-    }
-
-    private fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
-        val title = response.title
-        val overview = response.overview
-        val releaseDate = response.release_date
-        val genres = response.genres.joinToString {
-            it.name
-        }
-
-        val duration = response.runtime
-        val backDropImage = response.backdrop_path
-        val vote = response.vote_average
-        val posterImage = response.poster_path
-        val movieInfo = MovieInfo(
-            response.status,
-            response.original_language,
-            response.budget,
-            response.revenue
-        )
-
-        return MovieDetailsModel(
-            title,
-            overview,
-            releaseDate,
-            genres,
-            duration,
-            backDropImage,
-            vote,
-            posterImage,
-            movieInfo
-        )
-    }
-
 }

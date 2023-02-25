@@ -1,4 +1,4 @@
-package com.retroent.moviebuff.data
+package com.retroent.moviebuff.data.moviedetails
 
 data class MovieDetailsResponse(
     val adult: Boolean,
@@ -27,3 +27,4 @@ data class MovieDetailsResponse(
     val vote_average: Double,
     val vote_count: Int
 )
+

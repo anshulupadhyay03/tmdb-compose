@@ -2,10 +2,12 @@ package com.retroent.moviebuff.features.moviedetails
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,9 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,8 +30,10 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.retroent.moviebuff.R
 import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
 import com.retroent.moviebuff.domain.moviedetails.MovieInfo
+import com.retroent.moviebuff.domain.moviedetails.MovieReview
 import com.retroent.moviebuff.features.commonui.AddVoteProgressBar
 import eu.wewox.textflow.TextFlow
 import eu.wewox.textflow.TextFlowObstacleAlignment
@@ -37,15 +43,25 @@ fun MovieDetailsScreen(
     movieDetailsViewModel: MovieDetailsVm = hiltViewModel()
 ) {
     val movieDetailState by movieDetailsViewModel.movieDetailState.collectAsState()
-    when (movieDetailState) {
-        MovieDetailsUiState.Loading -> {
-            println("Loading")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        when (movieDetailState) {
+            MovieDetailsUiState.Loading -> {
+                println("Loading")
+            }
+            is MovieDetailsUiState.Success -> {
+                ShowMovieDetails((movieDetailState as MovieDetailsUiState.Success).movieDetails)
+            }
+            else -> {
+                println("Error")
+            }
         }
-        is MovieDetailsUiState.Success -> {
-            ShowMovieDetails((movieDetailState as MovieDetailsUiState.Success).movieDetails)
-        }
-        else -> {
-            println("Error")
+        val reviews by movieDetailsViewModel.stateFlowOfReviews.collectAsState()
+        if (reviews.isNotEmpty()) {
+            ShowReviews(reviews)
         }
     }
 
@@ -54,14 +70,93 @@ fun MovieDetailsScreen(
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun ShowMovieDetails(movieDetailsModel: MovieDetailsModel) {
+    ShowImages(movieDetailsModel)
+    ShowOverview(movieDetailsModel.overview, movieDetailsModel.vote)
+    ShowMovieInfo(movieDetailsModel.movieInfo)
+}
+
+@Composable
+fun ShowReviews(reviews: List<MovieReview>) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .fillMaxWidth()
+            .padding(5.dp)
     ) {
-        ShowImages(movieDetailsModel)
-        ShowOverview(movieDetailsModel.overview, movieDetailsModel.vote)
-        ShowMovieInfo(movieDetailsModel.movieInfo)
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = "Reviews(${reviews.size})",
+            color = Color.DarkGray,
+            fontWeight = FontWeight.Bold
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(top = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            reviews.forEach {
+                ShowReviewCards(it)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowReviewCards(review: MovieReview) {
+    Card(modifier = Modifier
+        .width(350.dp)
+        .height(120.dp),
+        onClick = { }
+    ) {
+        Row {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data("https://image.tmdb.org/t/p/original${review.avatarPath}")
+                    .crossfade(true)
+                    .error(R.drawable.user_avtar)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp)
+                    .clip(CircleShape)
+            )
+            Column(modifier = Modifier.padding(5.dp)) {
+                Row {
+                    Text(text = review.title)
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 7.dp)
+                            .background(Color.Blue, RoundedCornerShape(10.dp))
+                            .padding(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = review.rating.toString(),
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                        Image(
+                            modifier = Modifier.padding(start = 3.dp, end = 3.dp),
+                            painter = painterResource(id = R.drawable.star),
+                            contentDescription =
+                            "ratestar"
+                        )
+                    }
+                }
+                Text(text = review.updatedAt)
+            }
+        }
+        Text(
+            text = review.content,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.widthIn(max = 350.dp)
+        )
     }
 }
 
@@ -75,18 +170,18 @@ fun ShowMovieInfo(movieInfo: MovieInfo) {
         horizontalArrangement = Arrangement.SpaceBetween
 
     ) {
-        MovieInfoText("Status",movieInfo.status)
+        MovieInfoText("Status", movieInfo.status)
 
-        MovieInfoText("Language",movieInfo.language)
+        MovieInfoText("Language", movieInfo.language)
 
-        MovieInfoText("Budget",movieInfo.movieBudget)
+        MovieInfoText("Budget", movieInfo.movieBudget)
 
-        MovieInfoText("Revenue",movieInfo.movieRevenue)
+        MovieInfoText("Revenue", movieInfo.movieRevenue)
     }
 }
 
 @Composable
-fun MovieInfoText(title:String,data:String) {
+fun MovieInfoText(title: String, data: String) {
     Column(modifier = Modifier.padding(3.dp)) {
         Text(
             text = title,
@@ -117,7 +212,7 @@ private fun ShowOverview(overview: String, vote: Double) {
             .padding(5.dp),
         text = overview,
         obstacleAlignment = TextFlowObstacleAlignment.TopStart,
-        ) {
+    ) {
         AddVoteProgressBar(voteAverage = vote)
     }
 }
