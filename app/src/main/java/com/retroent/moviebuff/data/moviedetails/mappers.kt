@@ -42,7 +42,9 @@ internal fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
 fun mapUserReviews(reviews: MovieReviewsResponse): List<MovieReview> {
     return reviews.results.map {
         MovieReview(
-            it.content,
+            it.content
+                .replace("\r", "")
+                .replace("\n", ""),
             it.author,
             it.updated_at.dateFormat(),
             it.url,
@@ -55,7 +57,7 @@ fun mapUserReviews(reviews: MovieReviewsResponse): List<MovieReview> {
 private fun String.dateFormat(): String {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
     val outputFormat = SimpleDateFormat("dd MMM yy", Locale.getDefault())
-    val date = inputFormat.parse(this)
+    val date = inputFormat.parse(this) ?: return ""
     return outputFormat.format(date)
 
 }

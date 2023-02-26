@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
 import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.domain.moviedetails.MovieReview
 import com.retroent.moviebuff.features.commonui.AddVoteProgressBar
+import com.retroent.moviebuff.features.commonui.ChipVerticalGrid
 import eu.wewox.textflow.TextFlow
 import eu.wewox.textflow.TextFlowObstacleAlignment
 
@@ -63,16 +65,37 @@ fun MovieDetailsScreen(
         if (reviews.isNotEmpty()) {
             ShowReviews(reviews)
         }
-    }
 
+        val keywords by movieDetailsViewModel.keywords.collectAsState()
+        ShowKeyWords(keywords)
+    }
 }
 
-@OptIn(ExperimentalTextApi::class)
+@Composable
+fun ShowKeyWords(keywords: List<String>) {
+    ChipVerticalGrid(
+        spacing = 7.dp,
+        modifier = Modifier
+            .padding(7.dp)
+    ) {
+        keywords.forEach { word ->
+            Text(
+                word,
+                color = Color.White,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                    .padding(vertical = 3.dp, horizontal = 5.dp)
+            )
+        }
+    }
+}
+
 @Composable
 fun ShowMovieDetails(movieDetailsModel: MovieDetailsModel) {
     ShowImages(movieDetailsModel)
     ShowOverview(movieDetailsModel.overview, movieDetailsModel.vote)
     ShowMovieInfo(movieDetailsModel.movieInfo)
+
 }
 
 @Composable
@@ -151,11 +174,14 @@ fun ShowReviewCards(review: MovieReview) {
                 Text(text = review.updatedAt)
             }
         }
+        println("what ${review.content}")
         Text(
             text = review.content,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(max = 350.dp)
+            modifier = Modifier
+                .widthIn(max = 350.dp)
+                .padding(start = 5.dp)
         )
     }
 }
@@ -204,7 +230,6 @@ fun MovieInfoText(title: String, data: String) {
 }
 
 @Composable
-@OptIn(ExperimentalTextApi::class)
 private fun ShowOverview(overview: String, vote: Double) {
     TextFlow(
         modifier = Modifier
@@ -267,7 +292,7 @@ private fun ShowImages(movieDetailsModel: MovieDetailsModel) {
                         .height(180.dp)
                         .padding(start = 5.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .zIndex(0.7f)
+                        .zIndex(10f)
                 )
             }
             Column(modifier = Modifier.padding(5.dp)) {

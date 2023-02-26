@@ -40,4 +40,11 @@ class MovieDetailsVm @Inject constructor(
 
         )
 
+    val keywords: StateFlow<List<String>> =
+        repo.getKeywords(movieId!!).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
 }

@@ -19,7 +19,7 @@ class MovieDetailsRepo @Inject constructor(private val service: BottomMenuApiSer
         }
     }
 
-    fun getMovieReviews(id:Int) = flow {
+    fun getMovieReviews(id: Int) = flow {
         service.getMovieReviews(id).suspendOnSuccess {
             emit(mapUserReviews(this.data))
         }.onError {
@@ -27,6 +27,19 @@ class MovieDetailsRepo @Inject constructor(private val service: BottomMenuApiSer
         }.onException {
             println("Movies error :${this}")
         }
+    }
+
+    fun getKeywords(movieId: Int) = flow {
+        service.getKeyWords(movieId).suspendOnSuccess {
+            emit(this.data.keywords.map {
+                it.name
+            })
+        }.onError {
+            println("Movies error :${this.errorBody}")
+        }.onException {
+            println("Movies error :${this}")
+        }
+
     }
 
 

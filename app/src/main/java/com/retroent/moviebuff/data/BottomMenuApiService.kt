@@ -1,5 +1,6 @@
 package com.retroent.moviebuff.data
 
+import com.retroent.moviebuff.data.moviedetails.KeywordsResponse
 import com.retroent.moviebuff.data.moviedetails.MovieReviewsResponse
 import com.retroent.moviebuff.data.moviedetails.MovieDetailsResponse
 import com.skydoves.sandwich.ApiResponse
@@ -25,4 +26,7 @@ interface BottomMenuApiService {
 
     @GET("3/movie/{movie_id}/reviews")
     suspend fun getMovieReviews(@Path("movie_id") id:Int) : ApiResponse<MovieReviewsResponse>
+
+    @GET("3/movie/{movie_id}/keywords")
+    suspend fun getKeyWords(@Path("movie_id") id:Int) : ApiResponse<KeywordsResponse>
 }

@@ -14,11 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
@@ -219,5 +222,43 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
         0 -> remember(this) { LazyListState(0, 0) }
         // Return rememberLazyListState (normal case).
         else -> androidx.compose.foundation.lazy.rememberLazyListState()
+    }
+}
+
+@Composable
+fun ChipVerticalGrid(
+    modifier: Modifier = Modifier,
+    spacing: Dp,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        content = content,
+        modifier = modifier
+    ) { measurables, constraints ->
+        var currentRow = 0
+        var currentOrigin = IntOffset.Zero
+        val spacingValue = spacing.toPx().toInt()
+        val placeables = measurables.map { measurable ->
+            val placeable = measurable.measure(constraints)
+
+            if (currentOrigin.x > 0f && currentOrigin.x + placeable.width > constraints.maxWidth) {
+                currentRow += 1
+                currentOrigin = currentOrigin.copy(x = 0, y = currentOrigin.y + placeable.height + spacingValue)
+            }
+
+            placeable to currentOrigin.also {
+                currentOrigin = it.copy(x = it.x + placeable.width + spacingValue)
+            }
+        }
+
+        layout(
+            width = constraints.maxWidth,
+            height = placeables.lastOrNull()?.run { first.height + second.y } ?: 0
+        ) {
+            placeables.forEach {
+                val (placeable, origin) = it
+                placeable.place(origin.x, origin.y)
+            }
+        }
     }
 }
