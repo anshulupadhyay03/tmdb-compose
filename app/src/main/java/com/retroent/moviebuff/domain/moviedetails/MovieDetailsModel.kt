@@ -9,7 +9,10 @@ data class MovieDetailsModel(
     val backDropImage: String,
     val vote: Double,
     val posterImage: String,
-    val movieInfo: MovieInfo
+    val movieInfo: MovieInfo,
+    val keywords: List<String>,
+    val reviews: List<MovieReview>,
+    val topCast: List<MovieCast>
 )
 
 data class MovieInfo(
@@ -30,8 +33,14 @@ data class MovieReview(
     val title: String,
     val updatedAt: String,
     val url: String,
-    val avatarPath: String,
+    val avatarPath: String? = null,
     val rating: Int
+)
+
+data class MovieCast(
+    val name: String,
+    val avatarPath: String? = "",
+    val characterName: String
 )
 
 

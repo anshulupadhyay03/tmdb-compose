@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.retroent.moviebuff.data.moviedetails.MovieDetailsRepo
-import com.retroent.moviebuff.domain.moviedetails.MovieReview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,22 +28,5 @@ class MovieDetailsVm @Inject constructor(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = MovieDetailsUiState.Loading
-
             )
-
-    val stateFlowOfReviews: StateFlow<List<MovieReview>> =
-        repo.getMovieReviews(movieId!!).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-
-        )
-
-    val keywords: StateFlow<List<String>> =
-        repo.getKeywords(movieId!!).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
 }

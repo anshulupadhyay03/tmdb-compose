@@ -1,5 +1,6 @@
 package com.retroent.moviebuff.data.moviedetails
 
+import com.retroent.moviebuff.domain.moviedetails.MovieCast
 import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
 import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.domain.moviedetails.MovieReview
@@ -26,6 +27,19 @@ internal fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
         response.revenue
     )
 
+    val keywords = response.keywords.keywords.map {
+        it.name
+    }
+
+    val reviews = mapUserReviews(response.reviews)
+
+    val topCast = response.credits.cast.asSequence()
+        .filter {
+            it.known_for_department == "Acting"
+        }.map {
+            MovieCast(it.original_name, it.profile_path, it.character)
+        }.toList()
+
     return MovieDetailsModel(
         title,
         overview,
@@ -35,11 +49,14 @@ internal fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
         backDropImage,
         vote,
         posterImage,
-        movieInfo
-    )
+        movieInfo,
+        keywords,
+        reviews,
+        topCast
+        )
 }
 
-fun mapUserReviews(reviews: MovieReviewsResponse): List<MovieReview> {
+private fun mapUserReviews(reviews: MovieReviewsResponse): List<MovieReview> {
     return reviews.results.map {
         MovieReview(
             it.content

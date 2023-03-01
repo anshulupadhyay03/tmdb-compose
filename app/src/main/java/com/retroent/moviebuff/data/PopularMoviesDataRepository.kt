@@ -25,7 +25,7 @@ class PopularMoviesDataRepository @Inject constructor(private val service: Botto
     private fun mapToDomain(data: PUNTMoviesResponse): List<MovieResult> {
         return data.results.map {
             MovieResult(
-                it.posterPath,
+                it.posterPath?:"",
                 it.id,
                 it.title,
                 it.popularity,

@@ -9,9 +9,8 @@ import com.retroent.moviebuff.features.commonui.DisplayMovies
 internal fun UpcomingMovies(
     viewModel: UpcomingMoviesViewModel = hiltViewModel(),
     onItemClick: (id: Int?) -> Unit
-){
-
+) {
     val state = viewModel.upcomingMovies.collectAsLazyPagingItems()
-    DisplayMovies(state,onItemClick)
+    DisplayMovies(state, onItemClick)
 }
 

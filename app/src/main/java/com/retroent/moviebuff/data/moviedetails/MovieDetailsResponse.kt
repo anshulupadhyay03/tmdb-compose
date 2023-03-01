@@ -3,7 +3,6 @@ package com.retroent.moviebuff.data.moviedetails
 data class MovieDetailsResponse(
     val adult: Boolean,
     val backdrop_path: String,
-    val belongs_to_collection: Any,
     val budget: Long,
     val genres: List<Genre>,
     val homepage: String,
@@ -25,6 +24,9 @@ data class MovieDetailsResponse(
     val title: String,
     val video: Boolean,
     val vote_average: Double,
-    val vote_count: Int
+    val vote_count: Int,
+    val keywords: KeywordsResponse,
+    val reviews: MovieReviewsResponse,
+    val credits: MovieCastResponse
 )
 

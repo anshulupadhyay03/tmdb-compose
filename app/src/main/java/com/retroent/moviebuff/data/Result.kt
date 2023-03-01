@@ -21,7 +21,7 @@ data class Result(
     @SerializedName("popularity")
     val popularity: Double = 0.0,
     @SerializedName("poster_path")
-    val posterPath: String = "",
+    val posterPath: String? = "",
     @SerializedName("release_date")
     val releaseDate: String = "",
     @SerializedName("title")

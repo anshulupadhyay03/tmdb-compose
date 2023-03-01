@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.retroent.moviebuff.R
+import com.retroent.moviebuff.domain.moviedetails.MovieCast
 import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
 import com.retroent.moviebuff.domain.moviedetails.MovieInfo
 import com.retroent.moviebuff.domain.moviedetails.MovieReview
@@ -61,30 +62,89 @@ fun MovieDetailsScreen(
                 println("Error")
             }
         }
-        val reviews by movieDetailsViewModel.stateFlowOfReviews.collectAsState()
-        if (reviews.isNotEmpty()) {
-            ShowReviews(reviews)
-        }
-
-        val keywords by movieDetailsViewModel.keywords.collectAsState()
-        ShowKeyWords(keywords)
     }
+}
+
+@Composable
+fun ShowCasts(casts: List<MovieCast>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = "Top Actors",
+            color = Color.DarkGray,
+            fontWeight = FontWeight.Bold
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .horizontalScroll(rememberScrollState())
+                .padding(top = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            casts.forEach {
+                Column(
+                    modifier = Modifier
+                        .padding(start = 5.dp, end = 5.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data("https://image.tmdb.org/t/p/original${it.avatarPath}")
+                            .crossfade(true)
+                            .error(R.drawable.user_avtar)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(100.dp)
+                            .clip(RoundedCornerShape(10))
+                    )
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .widthIn(max = 100.dp),
+                        text = it.name,
+                        color = Color.DarkGray,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .widthIn(max = 100.dp),
+                        text = it.characterName,
+                        color = Color.DarkGray,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
 fun ShowKeyWords(keywords: List<String>) {
     ChipVerticalGrid(
-        spacing = 7.dp,
+        spacing = 3.dp,
         modifier = Modifier
             .padding(7.dp)
     ) {
         keywords.forEach { word ->
             Text(
-                word,
+                fontSize = 8.sp,
+                text = word,
                 color = Color.White,
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                    .padding(vertical = 3.dp, horizontal = 5.dp)
+                    .padding(vertical = 2.dp, horizontal = 5.dp)
             )
         }
     }
@@ -95,7 +155,11 @@ fun ShowMovieDetails(movieDetailsModel: MovieDetailsModel) {
     ShowImages(movieDetailsModel)
     ShowOverview(movieDetailsModel.overview, movieDetailsModel.vote)
     ShowMovieInfo(movieDetailsModel.movieInfo)
-
+        if (movieDetailsModel.reviews.isNotEmpty()) {
+            ShowReviews(movieDetailsModel.reviews)
+        }
+        ShowKeyWords(movieDetailsModel.keywords)
+        ShowCasts(movieDetailsModel.topCast)
 }
 
 @Composable

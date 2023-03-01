@@ -19,7 +19,7 @@ class MovieDetailsRepo @Inject constructor(private val service: BottomMenuApiSer
         }
     }
 
-    fun getMovieReviews(id: Int) = flow {
+    /*fun getMovieReviews(id: Int) = flow {
         service.getMovieReviews(id).suspendOnSuccess {
             emit(mapUserReviews(this.data))
         }.onError {
@@ -39,8 +39,22 @@ class MovieDetailsRepo @Inject constructor(private val service: BottomMenuApiSer
         }.onException {
             println("Movies error :${this}")
         }
-
     }
 
-
+    fun getTopCasts(movieId: Int) = flow {
+        service.getTopCast(movieId).suspendOnSuccess {
+            emit(this.data.cast
+                .asSequence()
+                .filter {
+                    it.known_for_department == "Acting"
+                }.map {
+                    MovieCast(it.original_name, it.profile_path, it.character)
+                }.toList()
+            )
+        }.onError {
+            println("Movies error :${this.errorBody}")
+        }.onException {
+            println("Movies error :${this}")
+        }
+    }*/
 }
