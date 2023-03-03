@@ -12,7 +12,10 @@ data class MovieDetailsModel(
     val movieInfo: MovieInfo,
     val keywords: List<String>,
     val reviews: List<MovieReview>,
-    val topCast: List<MovieCast>
+    val topCast: List<MovieCast>,
+    val videos: List<Videos>,
+    val posters:List<String>,
+    val backdrops:List<String>
 )
 
 data class MovieInfo(
@@ -41,6 +44,11 @@ data class MovieCast(
     val name: String,
     val avatarPath: String? = "",
     val characterName: String
+)
+
+data class Videos(
+    val key:String,
+    val site:String
 )
 
 

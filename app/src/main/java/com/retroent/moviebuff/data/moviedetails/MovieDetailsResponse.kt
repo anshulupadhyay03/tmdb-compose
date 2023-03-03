@@ -27,6 +27,8 @@ data class MovieDetailsResponse(
     val vote_count: Int,
     val keywords: KeywordsResponse,
     val reviews: MovieReviewsResponse,
-    val credits: MovieCastResponse
+    val credits: MovieCastResponse,
+    val images:MovieImages,
+    val videos:MovieVideos
 )
 

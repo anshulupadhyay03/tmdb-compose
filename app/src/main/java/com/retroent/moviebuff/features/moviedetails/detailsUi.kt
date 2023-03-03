@@ -27,15 +27,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.retroent.moviebuff.R
-import com.retroent.moviebuff.domain.moviedetails.MovieCast
-import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
-import com.retroent.moviebuff.domain.moviedetails.MovieInfo
-import com.retroent.moviebuff.domain.moviedetails.MovieReview
+import com.retroent.moviebuff.domain.moviedetails.*
 import com.retroent.moviebuff.features.commonui.AddVoteProgressBar
 import com.retroent.moviebuff.features.commonui.ChipVerticalGrid
 import eu.wewox.textflow.TextFlow
@@ -72,13 +73,7 @@ fun ShowCasts(casts: List<MovieCast>) {
             .fillMaxWidth()
             .padding(5.dp)
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth(),
-            text = "Top Actors",
-            color = Color.DarkGray,
-            fontWeight = FontWeight.Bold
-        )
+        ShowHeaderText("Top Actors")
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,6 +126,17 @@ fun ShowCasts(casts: List<MovieCast>) {
 }
 
 @Composable
+private fun ShowHeaderText(title:String) {
+    Text(
+        modifier = Modifier
+            .fillMaxWidth(),
+        text = title,
+        color = Color.DarkGray,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+@Composable
 fun ShowKeyWords(keywords: List<String>) {
     ChipVerticalGrid(
         spacing = 3.dp,
@@ -155,11 +161,104 @@ fun ShowMovieDetails(movieDetailsModel: MovieDetailsModel) {
     ShowImages(movieDetailsModel)
     ShowOverview(movieDetailsModel.overview, movieDetailsModel.vote)
     ShowMovieInfo(movieDetailsModel.movieInfo)
-        if (movieDetailsModel.reviews.isNotEmpty()) {
-            ShowReviews(movieDetailsModel.reviews)
+    if (movieDetailsModel.reviews.isNotEmpty()) {
+        ShowReviews(movieDetailsModel.reviews)
+    }
+    ShowKeyWords(movieDetailsModel.keywords)
+    ShowCasts(movieDetailsModel.topCast)
+    ShowPostersAndBackDrops(movieDetailsModel.posters,movieDetailsModel.backdrops)
+    ShowVideos(movieDetailsModel.videos)
+}
+
+@Composable
+fun ShowPostersAndBackDrops(posters: List<String>, backdrops: List<String>) {
+    Column(modifier = Modifier.padding(5.dp)) {
+        if(posters.isNotEmpty()){
+            ShowHeaderText("Posters")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                posters.forEach {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data("https://image.tmdb.org/t/p/original$it")
+                            .crossfade(true)
+                            .error(R.drawable.user_avtar)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(200.dp)
+                    )
+                }
+            }
         }
-        ShowKeyWords(movieDetailsModel.keywords)
-        ShowCasts(movieDetailsModel.topCast)
+
+        if(backdrops.isNotEmpty()){
+            ShowHeaderText("Backdrops")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp)
+                    .height(200.dp)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                backdrops.forEach {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data("https://image.tmdb.org/t/p/original$it")
+                            .crossfade(true)
+                            .error(R.drawable.user_avtar)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(200.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowVideos(videos: List<Videos>) {
+    if(videos.isNotEmpty()){
+        ShowHeaderText(title = "Videos")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(5.dp)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            videos.forEach { videoId ->
+                Box(modifier = Modifier.width(250.dp)) {
+                    AndroidView(factory = {
+                        val view = YouTubePlayerView(it)
+                        view.addYouTubePlayerListener(
+                            object : AbstractYouTubePlayerListener() {
+                                override fun onReady(youTubePlayer: YouTubePlayer) {
+                                    super.onReady(youTubePlayer)
+                                    youTubePlayer.cueVideo(videoId.key, 0f)
+                                }
+                            }
+                        )
+                        view
+                    })
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -169,13 +268,7 @@ fun ShowReviews(reviews: List<MovieReview>) {
             .fillMaxWidth()
             .padding(5.dp)
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth(),
-            text = "Reviews(${reviews.size})",
-            color = Color.DarkGray,
-            fontWeight = FontWeight.Bold
-        )
+       ShowHeaderText(title = "Reviews(${reviews.size})")
         Row(
             modifier = Modifier
                 .fillMaxWidth()

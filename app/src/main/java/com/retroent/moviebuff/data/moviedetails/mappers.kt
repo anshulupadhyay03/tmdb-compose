@@ -1,9 +1,6 @@
 package com.retroent.moviebuff.data.moviedetails
 
-import com.retroent.moviebuff.domain.moviedetails.MovieCast
-import com.retroent.moviebuff.domain.moviedetails.MovieDetailsModel
-import com.retroent.moviebuff.domain.moviedetails.MovieInfo
-import com.retroent.moviebuff.domain.moviedetails.MovieReview
+import com.retroent.moviebuff.domain.moviedetails.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,6 +37,20 @@ internal fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
             MovieCast(it.original_name, it.profile_path, it.character)
         }.toList()
 
+    val videos = response.videos.results.map {
+        Videos(it.key, it.site)
+    }
+
+    val posters = response.images.posters.map {
+        it.file_path
+    }
+
+    val backdrops = response.images.backdrops.map {
+        it.file_path
+    }
+
+
+
     return MovieDetailsModel(
         title,
         overview,
@@ -52,8 +63,11 @@ internal fun mapToDomain(response: MovieDetailsResponse): MovieDetailsModel {
         movieInfo,
         keywords,
         reviews,
-        topCast
-        )
+        topCast,
+        videos,
+        posters,
+        backdrops
+    )
 }
 
 private fun mapUserReviews(reviews: MovieReviewsResponse): List<MovieReview> {

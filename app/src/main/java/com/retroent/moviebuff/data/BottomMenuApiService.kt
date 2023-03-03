@@ -22,6 +22,6 @@ interface BottomMenuApiService {
     @GET("3/movie/{movie_id}")
     suspend fun getMovieDetails(
         @Path("movie_id") id: Int,
-        @Query("append_to_response") appendOtherRequest: String = "keywords,reviews,credits"
+        @Query("append_to_response") appendOtherRequest: String = "keywords,reviews,credits,images,videos"
     ): ApiResponse<MovieDetailsResponse>
 }
